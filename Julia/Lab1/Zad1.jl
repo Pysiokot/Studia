@@ -1,6 +1,5 @@
 abstract Zwierzę
 
-type NULL <: Zwierzę end 
 type Drapieżnik <: Zwierzę
     x::Int64
     y::Int64
@@ -9,6 +8,7 @@ type Ofiara <: Zwierzę
     x::Int64
     y::Int64
 end
+type NULL <: Zwierzę end 
 type Zajęte <: Exception end
 
 N = 10
@@ -21,7 +21,7 @@ function wyczyść_planszę()
 end
 
 function znajdź_miejsce()
-    x, y = 1, 1
+    x, y = rand(1:N), rand(1:N)
     while plansza[x,y] != NULL()
         x = rand(1:N)
         y = rand(1:N)
@@ -49,7 +49,7 @@ function wypisz_planszę()
     end
 end
 
-function policz_odległość(zwirz::Zwierzę, zwirzu::Zwierzę)
+function policz_odległość{T1 <: Zwierzę, T2 <: Zwierzę} (zwirz::T1, zwirzu::T2)
     return abs(zwirz.x - zwirzu.x) + abs(zwirz.y - zwirzu.y)
 end
 
@@ -62,10 +62,10 @@ function interakcja(zwirz::Ofiara, zwirzu::Ofiara)
 end
 
 function interakcja(zwirz::Ofiara, zwirzu::Drapieżnik)
-    (x, y) = znajdźMiejsce()
+    (x, y) = znajdź_miejsce()
     plansza[zwirz.x, zwirz.y] = NULL()
     zwirz.x, zwirz.y = x, y
-    postawZwierzaka(zwirz)
+    postaw_zwierzaka(zwirz)
 end
 
 function interakcja(zwirz::Drapieżnik, zwirzu::Ofiara)

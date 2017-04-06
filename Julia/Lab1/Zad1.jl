@@ -21,7 +21,7 @@ function wyczyść_planszę()
 end
 
 function znajdź_miejsce()
-    x, y = 1, 1
+    x, y = rand(1:N), rand(1:N)
     while plansza[x,y] != NULL()
         x = rand(1:N)
         y = rand(1:N)
@@ -43,7 +43,7 @@ function wypisz_planszę()
     for x in 1:N
         for y in 1:N
             print(plansza[x,y])
-            print("  ")
+            print("\t")
         end
         print("\n")
     end
@@ -62,10 +62,10 @@ function interakcja(zwirz::Ofiara, zwirzu::Ofiara)
 end
 
 function interakcja(zwirz::Ofiara, zwirzu::Drapieżnik)
-    (x, y) = znajdźMiejsce()
+    (x, y) = znajdź_miejsce()
     plansza[zwirz.x, zwirz.y] = NULL()
     zwirz.x, zwirz.y = x, y
-    postawZwierzaka(zwirz)
+    postaw_zwierzaka(zwirz)
 end
 
 function interakcja(zwirz::Drapieżnik, zwirzu::Ofiara)

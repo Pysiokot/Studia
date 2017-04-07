@@ -43,7 +43,7 @@ function wypisz_planszę()
     for x in 1:N
         for y in 1:N
             print(plansza[x,y])
-            print("  ")
+            print("\t")
         end
         print("\n")
     end

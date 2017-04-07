@@ -76,15 +76,17 @@ int main(int argc, char **argv){
         	exit(1);
     	} 
 		else if (kitki == 0) {
-			if(signal(greenLaser, greenLaserHandler) == SIG_ERR)
-				perror("receiving SIGUSR2 error");
-			srand(time(NULL) + getpid());
-			sleep(rand()%11);
-			times(&now);
-			startTime = clock();
-			kill(catPID, redLaser);
-			pause();
-        	exit(0); 
+			if(reqCount <= limitOfRequests){
+				if(signal(greenLaser, greenLaserHandler) == SIG_ERR)
+					perror("receiving SIGUSR2 error");
+				srand(time(NULL) + getpid());
+				sleep(rand()%11);
+				times(&now);
+				startTime = clock();
+				kill(catPID, redLaser);
+				pause();
+				exit(0); 
+			}
     	}
 	}
 	int tmp;
@@ -101,8 +103,9 @@ int main(int argc, char **argv){
 			war = false;
 		}
 	}
-	while (tmp >= 0)
-		kill(kittyPID[tmp--],greenLaser);
+	int licz = 0;
+	while (licz <= tmp)
+		kill(kittyPID[licz++],greenLaser);
 
     while(true);
     return 0;
@@ -113,10 +116,12 @@ void printTime(){
 }
 
 void redLaserHandler(int sigNummer, siginfo_t *val){
+	printf("\nSIGUSR1 Sent\n");
     kittyPID[reqCount++] = val -> si_pid;
 }
 
 void greenLaserHandler(int sigNummer){
+	printf("\nSIGUSR2 Recieved\n");
 	kill(catPID, rand()%(SIGRTMAX-SIGRTMIN)+SIGRTMIN);
 	endTime = clock();
 	printTime();
@@ -134,7 +139,7 @@ void napTimeAfterCatchingRedLaser(int sigNummer, siginfo_t *val){
 
 void putAllCatsToSleep(int sigNummer){
     int i = 0;
-    while( i < numOfProcessess){
+    while(i < numOfProcessess){
         kill(kittyPID[i++], SIGKILL);
     }
     kill(catPID, SIGKILL);

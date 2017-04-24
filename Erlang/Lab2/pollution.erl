@@ -8,6 +8,7 @@
 -export([getOneValue/4]).
 -export([getStationMean/3]).
 -export([getDailyMean/3]).
+-export([getMovingMean/4]).
 
 -record(coordinates, {horizontal, vertical}).
 -record(measurement, {type, value, date}).
@@ -78,6 +79,31 @@ getStationMean(Station, Type, Monitor) ->
     end.
 
 getDailyMean(Type, Day, Monitor) -> getMeanDayMeasurement(Type, Day, maps:values(Monitor), 0, 0). %"PM2,5", {{2017,4,24},{11,49,8}}, [{#coord{},[]}|Tail], 0, 0
+
+getMovingMean(Type, Date, Coords, Monitor) ->
+    case findCoords(Coords, maps:values(Monitor)) of
+        true -> getStationMovingMean2(Type, Date, maps:get(findName(maps:to_list(Monitor), Coords), Monitor));
+        _ -> throw("Station with these coords doesn't exist")
+    end.
+
+
+%private functions
+
+getStationMovingMean2(Type, Date, {_,Measurements}) -> getStationMovingMean(Type, Date, lists:sort(fun(#measurement{type = _, value = _, date = {_,{H1,_,_}}}, #measurement{type = _, value = _, date = {_,{H2,_,_}}}) -> H1 =< H2 end, Measurements), 0, 0, 24).
+
+getStationMovingMean(_,_,[],_,_,24) -> throw("No measures :c");
+getStationMovingMean(_,_,[], Counter, Denominator, _) when Denominator /= 0 -> Counter/Denominator;
+getStationMovingMean(_,_,_,Counter, Denominator, Steps) when Steps == 0 andalso Steps /= 24 -> Counter/Denominator;
+getStationMovingMean(Type, {{Y,M,D},{H,Min,S}}, [#measurement{type = Type, value = Value, date = {{Y,M,D},{H,_,_}}} | Tail], Counter, Denominator, Steps) ->
+    case H - 1 of
+        -1 -> getStationMovingMean(Type, {{Y,M,D},{H,Min,S}}, Tail, Counter + (Steps*Value), Denominator+Steps, 0);
+        _ -> getStationMovingMean(Type, {{Y,M,D},{H-1,Min,S}}, Tail, Counter + (Steps*Value), Denominator+Steps, Steps-1)
+    end;
+getStationMovingMean(Type, {{Y,M,D},{H,Min,S}}, [_|Tail], Counter, Denominator, Steps) -> 
+    case H - 1 of
+        -1 -> getStationMovingMean(Type, {{Y,M,D},{H,Min,S}}, Tail, Counter, Denominator, 0);
+        _ -> getStationMovingMean(Type, {{Y,M,D},{H-1,Min,S}}, Tail, Counter, Denominator, Steps-1)
+    end.
 
 %działa
 addMeasurement(Value, Date, Type, {Coords, List}) -> 

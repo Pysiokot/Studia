@@ -1,0 +1,11 @@
+void handleSigint(int signum);
+void handleSignal(int signum);
+int readLine(message *msg);
+int getIDFromServ();
+int recieveMessage(message *msg);
+long isQueueEmpty();
+int sendMessage(message *msg);
+mqd_t getServQueue();
+mqd_t makeQueue();
+void handleExit();
+void exitProgram(int status, char *exitMessage);

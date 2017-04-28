@@ -1,113 +1,172 @@
-//
-// Created by Mrz355 on 19.04.17.
-//
-
 #include <ctype.h>
 #include <time.h>
 #include <signal.h>
 #include <mqueue.h>
 #include "communication.h"
+#include "server.h"
 
-struct client {
-    pid_t pid;
-    mqd_t qid;
-};
 
-int terminate = 0; // flag which defines whether the client sends termination request
-mqd_t server_qid; // file descriptor of server queue
+int term = 0; // flag which defines whether the client sends termination request
+mqd_t serverQueueID; // file descriptor of server queue
 struct client clients[MAX_CLIENTS];
+int clientAmount = 0;
+int clientUniqID;
 
-void receive_message();
+int main() {
+    clientUniqID = 0;
+    atexit(exitHandler);
 
-int client_count = 0;
-int client_unique_id;
+    signal(SIGINT,sigint_handler);
 
-void exit_program(int status, char *exit_message) {
-    perror(exit_message);
+    puts("Launching CAAAAAAAT...");
+    serverQueueID = createQueue();
+    puts("CAT RUNNING! Joke, just sleepin'");
+
+    while(!term) {
+        recieveMessage();
+    }
+
+    return 0;
+}
+
+void recieveMessage() {
+    struct message msg;
+    unsigned int priority = 1;
+    if(mq_receive(serverQueueID, (char *) &msg, MAX_MSG_LEN, &priority) == -1) {
+        perror("Error while receiving kitty");
+    }
+    printf("%d messages: %s %s\n",msg.pid,COMMANDS_STR[msg.type],msg.value);
+    switch(msg.type) {
+        case LOGIN:
+            loginHandler(msg);
+            break;
+        case LOGOUT:
+            logoutHandler(msg);
+            break;
+        case ECHO:
+            handleECHO(msg);
+            break;
+        case UPPER:
+            handleUPPER(msg);
+            break;
+        case TIME:
+            handleTIME(msg);
+            break;
+        case term:
+            term = 1;
+            break;
+        default:
+            printf("%d unknown cat\n",msg.pid);
+    }
+}
+
+void handleUPPER(message msg) {
+    for(int i=0;msg.value[i];++i) {
+        msg.value[i] = (char) toupper(msg.value[i]);
+    }
+    sendMessagePID(msg.pid,&msg);
+}
+
+void handleECHO(message msg) {
+    sendMessagePID(msg.pid,&msg);
+}
+
+void handleTIME(message msg) {
+    time_t rawtime;
+    struct tm *timeinfo;
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+    strcpy(msg.value,asctime(timeinfo));
+    msg.value[strlen(msg.value)-1] = '\0';
+    sendMessagePID(msg.pid,&msg);
+}
+
+void exitProgram(int status, char *exitMsq) {
+    perror(exitMsq);
     exit(status);
 }
 
-mqd_t create_queue() {
+mqd_t createQueue() {
     struct mq_attr attr;
     attr.mq_maxmsg = MAX_QUEUE_SIZE;
     attr.mq_msgsize = MAX_MSG_SIZE;
-
     mqd_t res = mq_open(SERVER_NAME, O_CREAT | O_RDONLY, SERVER_QUEUE_PERM, &attr);
     if(res == -1) {
-        exit_program(EXIT_FAILURE,"Couldn't create server queue");
+        exitProgram(EXIT_FAILURE,"Couldn't create server queue");
     }
-
     return res;
 }
 
-void send_message_qid(mqd_t client_qid, message *msg) {
+void sendMessageQID(mqd_t clientQueueID, message *msg) {
     msg->pid = getpid();
-    if(mq_send(client_qid,(char *) msg,MAX_MSG_LEN,1) == -1) {
-        fprintf(stderr,"%d error while sending message to client",msg->pid);
+    if(mq_send(clientQueueID,(char *) msg,MAX_MSG_LEN,1) == -1) {
+        fprintf(stderr,"%d error while sending kitty to client",msg->pid);
     }
 }
-mqd_t get_client_qid(pid_t client_pid) {
-    mqd_t client_qid = -1;
-    for(int i=0;i<client_count;++i) {
-        if(clients[i].pid == client_pid) {
+
+mqd_t getClientQueue(pid_t clientPID) {
+    mqd_t clientQueueID = -1;
+    for(int i = 0; i < clientAmount; ++i) {
+        if(clients[i].pid == clientPID) {
             return clients[i].qid;
         }
     }
-    return client_qid;
+    return clientQueueID;
 }
-void send_message_pid(pid_t client_pid, message *msg) {
-    mqd_t client_qid = get_client_qid(client_pid);
-    if(client_qid == -1) {
-        fprintf(stderr,"%d not connected, terminating action\n",client_pid);
+
+void sendMessagePID(pid_t clientPID, message *msg) {
+    mqd_t clientQueueID = getClientQueue(clientPID);
+    if(clientQueueID == -1) {
+        fprintf(stderr,"%d not connected, terminating action\n",clientPID);
         return;
     }
-    send_message_qid(client_qid,msg);
+    sendMessageQID(clientQueueID,msg);
 }
 
-void login_handler(message msg) {
-    pid_t client_pid = msg.pid;
-    mqd_t client_qid;
-    char* client_name = msg.value; // by value we pass client's queue name
+void loginHandler(message msg) {
+    pid_t clientPID = msg.pid;
+    mqd_t clientQueueID;
+    char* clientName = msg.value; // by value we pass client's queue name
 
-    printf("%d is trying to connect...\n",client_pid);
+    printf("%d is trying to connect...\n",clientPID);
     sleep(1);
 
-    if((client_qid = mq_open(client_name, O_WRONLY)) == -1) {
-        fprintf(stderr,"%d couldn't open client queue\n", client_pid);
+    if((clientQueueID = mq_open(clientName, O_WRONLY)) == -1) {
+        fprintf(stderr,"%d couldn't open client queue\n", clientPID);
     }
 
     struct message response;
 
-    if(client_count == MAX_CLIENTS) {
+    if(clientAmount == MAX_CLIENTS) {
         response.type = DECLINE;
         strcpy(response.value,"-1");
-        printf("%d couldn't connect: max clients number reached\n",client_pid);
+        printf("%d couldn't connect: max cats number reached\n",clientPID);
     } else {
         struct client c1;
-        c1.pid = client_pid;
-        c1.qid = client_qid;
-        clients[client_count++] = c1;
+        c1.pid = clientPID;
+        c1.qid = clientQueueID;
+        clients[clientAmount++] = c1;
 
         response.type = ACCEPT;
-        snprintf(response.value,MAX_MSG_LEN,"%d",client_unique_id++);
-        printf("%d connected!\n",client_pid);
+        snprintf(response.value,MAX_MSG_LEN,"%d",clientUniqID++);
+        printf("%d you're on!\n",clientPID);
     }
-    send_message_qid(client_qid, &response);
+    sendMessageQID(clientQueueID, &response);
 }
 
-void logout_handler(message msg) {
-    mqd_t client_qid = get_client_qid(msg.pid);
-    pid_t client_pid = msg.pid;
-    if(client_qid == -1) {
-        fprintf(stderr,"%d not connected, terminating action\n",client_pid);
+void logoutHandler(message msg) {
+    mqd_t clientQueueID = getClientQueue(msg.pid);
+    pid_t clientPID = msg.pid;
+    if(clientQueueID == -1) {
+        fprintf(stderr,"%d not connected, terminating action\n",clientPID);
         return;
     }
     int i = 0;
-    while(clients[i].pid != client_pid) ++i;
-    printf("%d disconnected\n",client_pid);
+    while(clients[i].pid != clientPID) ++i;
+    printf("%d disconnected\n",clientPID);
 
-    --client_count;
-    while(i<client_count) {
+    --clientAmount;
+    while(i<clientAmount) {
         clients[i] = clients[i+1];
         ++i;
     }
@@ -115,110 +174,40 @@ void logout_handler(message msg) {
     struct message response;
     response.type = LOGOUT;
     strcpy(response.value, "You've successfully logged out");
-    send_message_qid(client_qid,&response);
+    sendMessageQID(clientQueueID,&response);
 }
 
-void echo_handler(message msg) {
-    send_message_pid(msg.pid,&msg);
-}
-void upper_handler(message msg) {
-    for(int i=0;msg.value[i];++i) {
-        msg.value[i] = (char) toupper(msg.value[i]);
-    }
-    send_message_pid(msg.pid,&msg);
-}
-void time_handler(message msg) {
-    time_t rawtime;
-    struct tm *timeinfo;
-    time(&rawtime); // seconds since epoch
-    timeinfo = localtime(&rawtime); // converting to local time-zone seconds
-
-    strcpy(msg.value,asctime(timeinfo)); // pretty-formatted string
-
-    msg.value[strlen(msg.value)-1] = '\0'; // getting rid of additional not needed /n (asctime adds one)
-
-    send_message_pid(msg.pid,&msg);
-}
-long queue_empty() {
+long emptyQueue() {
     struct mq_attr attr;
-    if(mq_getattr(server_qid,&attr) == -1) {
-        exit_program(EXIT_FAILURE,"Error while getting attributes from server queue");
+    if(mq_getattr(serverQueueID,&attr) == -1) {
+        exitProgram(EXIT_FAILURE,"Error while getting attributes from server queue");
     }
     return attr.mq_curmsgs == 0;
 }
-void terminate_server() {
-    puts("Terminating server. Responding to queued messages..");
-    while(!queue_empty()) {
-        receive_message();
+
+void killServer() {
+    puts("Killing server.");
+    while(!emptyQueue()) {
+        recieveMessage();
     }
     struct message response;
-    response.type = TERMINATE;
-    strcpy(response.value,"Server terminated. You've been logged out.");
+    response.type = term;
+    strcpy(response.value,"Server killed. You've been logged out.");
 
-    for(int i=0;i<client_count;++i) {
-        send_message_qid(clients[i].qid,&response);
+    for(int i = 0; i < clientAmount; ++i) {
+        sendMessageQID(clients[i].qid,&response);
         mq_close(clients[i].qid);
     }
-    mq_close(server_qid);
+    mq_close(serverQueueID);
     mq_unlink(SERVER_NAME);
-    terminate = 1;
-    puts("Server terminated.");
+    term = 1;
+    puts("Server killed.");
 }
 
-void exit_handler() {
-    terminate_server();
-}
-
-void receive_message() {
-    unsigned int priority = 1;
-    struct message msg;
-    ssize_t received_bytes = mq_receive(server_qid, (char *) &msg, MAX_MSG_LEN, &priority);
-    if(received_bytes == -1) {
-        perror("Error while receiving message");
-    }
-    printf("%d messages: %s %s\n",msg.pid,COMMANDS_STR[msg.type],msg.value);
-    switch(msg.type) {
-        case LOGIN:
-            login_handler(msg);
-            break;
-        case LOGOUT:
-            logout_handler(msg);
-            break;
-        case ECHO:
-            echo_handler(msg);
-            break;
-        case UPPER:
-            upper_handler(msg);
-            break;
-        case TIME:
-            time_handler(msg);
-            break;
-        case TERMINATE:
-            terminate = 1;
-            break;
-        default:
-            printf("%d unknown command\n",msg.pid);
-    }
+void exitHandler() {
+    killServer();
 }
 
 void sigint_handler(int signum) {
     exit(EXIT_SUCCESS);
-}
-
-// every (I hope) possible error handled inside functions create_queue and receive_message
-int main() {
-    client_unique_id = 0;
-    atexit(exit_handler);
-
-    signal(SIGINT,sigint_handler);
-
-    puts("Launching server...");
-    server_qid = create_queue();
-    puts("Server launched!");
-
-    while(!terminate) {
-        receive_message();
-    }
-
-    return 0;
 }

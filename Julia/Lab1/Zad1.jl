@@ -49,7 +49,7 @@ function wypisz_planszę()
     end
 end
 
-function policz_odległość{T1 <: Zwierzę, T2 <: Zwierzę} (zwirz::T1, zwirzu::T2)
+function policz_odległość{(T1 <: Zwierzę), (T2 <: Zwierzę)} (zwirz::T1, zwirzu::T2)
     return abs(zwirz.x - zwirzu.x) + abs(zwirz.y - zwirzu.y)
 end
 

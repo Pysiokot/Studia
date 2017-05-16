@@ -1,0 +1,65 @@
+5 sposobów optymalizacji
+np. bez zmiennych globalnych
+podać typy
+dobrze sprawdzać tablice
+
+
+@code_warntype funkcja()
+
+
+1. multiple dispatch added
+
+type of address Int64:
+before: 11.964608 seconds (117.21 M allocations: 12.786 GB, 17.86% gc time)
+afer: 11.382953 seconds (117.17 M allocations: 12.787 GB, 17.85% gc time)
+get_random_address() w przybliżeniu taki sam
+
+2. column order j,i
+lekkie przyspieszenie
+before
+9.003435 seconds (115.10 M allocations: 3.487 GB, 11.74% gc time)
+8.354947 seconds (115.10 M allocations: 3.487 GB, 11.21% gc time)
+8.797947 seconds (115.10 M allocations: 3.487 GB, 11.57% gc time)
+after
+  8.814867 seconds (115.10 M allocations: 3.487 GB, 14.63% gc time)
+  8.680350 seconds (115.10 M allocations: 3.487 GB, 13.81% gc time)
+  8.261861 seconds (115.10 M allocations: 3.487 GB, 14.73% gc time)
+
+zmieniony komentarz - get_random_address
+
+line 66 
+3. nodes = Vector{NodeType}()
+before:
+  0.000841 seconds (3.77 k allocations: 167.578 KB)
+  0.000821 seconds (3.77 k allocations: 167.578 KB)
+  0.000644 seconds (3.81 k allocations: 170.500 KB)
+
+after:
+  0.000241 seconds (3.84 k allocations: 172.625 KB)
+  0.000588 seconds (3.79 k allocations: 168.906 KB)
+  0.000501 seconds (3.83 k allocations: 171.828 KB)
+
+4. global variables removed
+
+before:
+  0.000502 seconds (3.77 k allocations: 167.578 KB)
+  0.001381 seconds (3.85 k allocations: 173.156 KB)
+  0.000571 seconds (3.82 k allocations: 171.031 KB)
+
+after:
+  0.000257 seconds (2.44 k allocations: 136.953 KB)
+  0.000338 seconds (2.31 k allocations: 128.188 KB)
+  0.000241 seconds (2.47 k allocations: 138.813 KB)
+
+5. keyword in function
+visited in bfs
+visited=Set{GraphVertex}()
+
+6. changed check_euler() -> żeby typ był tylko string
+nie zmienia zbyt wiele
+
+
+
+
+
+

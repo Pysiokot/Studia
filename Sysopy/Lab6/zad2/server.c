@@ -52,7 +52,7 @@ void recieveMessage() {
         case TIME:
             handleTIME(msg);
             break;
-        case term:
+        case TERMINATE:
             term = 1;
             break;
         default:

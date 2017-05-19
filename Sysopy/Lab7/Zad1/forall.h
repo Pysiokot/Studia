@@ -1,15 +1,6 @@
 #ifndef FORALL_H
 #define FORALL_H
 
-#define isOk(x, errval) \
-    do { \
-        if ((x) == (errval)) { \
-            fprintf(stderr, "%s:%d: ", __func__, __LINE__); \
-            perror(#x); \
-            exit(-1); \
-        } \
-    } while (0) \
-
 const int SEMAPHORESKEY = 1;
 const char *SEMAPHORESNAME = "/GOLIBRODA";
 const int SEMAPHORESNUM = 5;

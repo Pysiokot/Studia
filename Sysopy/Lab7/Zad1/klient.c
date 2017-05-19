@@ -13,23 +13,19 @@ int main(int argc, char **argv){
     while(--numberOfClients){
         child = fork();
         if(child == 0)  numberOfClients = 1;
-        CHECK(child, -1);
     }
 
     semaphores = semget(ftok(SEMAPHORESNAME, SEMAPHORESKEY), 0, 0);
-    CHECK(semaphores, -1);
 
     queue = shmget(ftok(QUEUENAME, QUEUEKEY), 0, 0);
-    CHECK(queue, -1);
 
     queueAddress = shmat(queue, NULL, 0);
-    CHECK(queueAddress, (void*)-1);
     atexit(unmapQueue);
 
-    *client = queueAddress;
-    *firstClient = queueAddress+sizeof(pid_t);
-    *queuen = queueAddress+sizeof(pid_t)+sizeof(int);
-    *clientsPIDs = queueAddress+sizeof(pid_t)+sizeof(int)*2;
+    client = queueAddress;
+    firstClient = queueAddress+sizeof(pid_t);
+    queuen = queueAddress+sizeof(pid_t)+sizeof(int);
+    clientsPIDs = queueAddress+sizeof(pid_t)+sizeof(int)*2;
 
 
     semaphoreAction.sem_flg = 0;

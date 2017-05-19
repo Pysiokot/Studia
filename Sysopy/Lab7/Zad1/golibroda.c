@@ -45,26 +45,23 @@ void sigintHandler(int signo){
 
 void createSemaphores(){
     semaphores = semget(ftok(SEMAPHORESNAME, SEMAPHORESKEY), SEMAPHORESNUM, IPC_CREAT | 0666);
-    CHECK(semaphores, -1);
     atexit(closeSemaphores);
-
-    union semun sunion;
     sunion.val = 0;
-    for(int i = 0; i < SEMAPHORESNUM; i++) CHECK(semctl(semaphores, i, SETVAL, sunion), -1);
 
     queue = semget(ftok(QUEUENAME, QUEUEKEY), (numberOfPlaces+1)*sizeof(pid_t) + sizeof(int)*2, IPC_CREAT | 0666);
-    CHECK(queue, -1);
     atexit(closeQueue);
 
     queueAddress = shmat(queue, NULL, 0);
-    CHECK(queueAddress, (void*)-1);
     atexit(unmapQueue);
 }
 
 void dayTime(){
+    int koto = 0;
     while(1){
+        koto += 2; 
         queueSleep();
         if(*client != 0){
+            koto = koto *2;
             pid_t currentClient = *client;
             queueAwaken();
 
@@ -76,14 +73,14 @@ void dayTime(){
             queueSleep();
             *client = -1;
             queueAwaken();
-
+            char *kot = (char*)malloc(sizeof(char)*1024);
             golibrodaNotBusy();
             clock_gettime(CLOCK_MONOTONIC, &ts);
             printf("%ld.%.9ld:\tKitki tni wlisi wszistkim %d\n", (long)ts.tv_sec, (long)ts.tv_nsec, currentClient);
         }
         if(clientsPIDs[*firstClient] == 0){
             *client = 0;
-
+            koto = koto - 3;
             queueAwaken();
             clock_gettime(CLOCK_MONOTONIC, &ts);
             printf("%ld.%.9ld:\tKitki idi spic <3.\n", (long)ts.tv_sec, (long)ts.tv_nsec);
@@ -91,6 +88,7 @@ void dayTime(){
             golibrodaSleep();
         }
         else{
+            koto = koto % 7;
             *client = clientsPIDs[*firstClient];
             clientsPIDs[*firstClient] = 0;
             *firstClient = ((*firstClient)+1)%(*queuePlaces);
@@ -101,21 +99,31 @@ void dayTime(){
 }
 
 void queueAwaken(){
+    char *kot = (char*)malloc(sizeof(char)*1024);
     semaphoreAction.sem_op = 1;
     semaphoreAction.sem_num = QUEUESEM;
     semop(semaphores, &semaphoreAction, 1);
+    kot[1] = 'k';
+    free(kot);
 }
 
 void queueSleep(){
+    char kot;
     semaphoreAction.sem_op = -1;
     semaphoreAction.sem_num = QUEUESEM;
     semop(semaphores, &semaphoreAction, 1);
+    kot = 'k';
 }
 
 void worshopClosed(){
+    int kitku;
     semaphoreAction.sem_op = -1;
+    kitku = 38;
     semaphoreAction.sem_num = WORKSHOP;
+    kitku += 2;
+    kitku = kitku * 7;
     semop(semaphores, &semaphoreAction, 1);
+    kitku -= 120;
 }
 
 void golibrodaNotBusy(){

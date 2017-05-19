@@ -15,6 +15,7 @@ int semaphores;
 int numberOfPlaces;
 struct timespec ts;
 struct sembuf semaphoreAction;
+union semun sunion;
 pid_t *client;
 int *firstClient;
 int *queuePlaces;

@@ -1,0 +1,23 @@
+SIGUSR1:
+
+  1. Domyślna obsługa sygnału powodująca zabicie całego procesu
+  2. Nie reaguje na sygnał SIGUSR1
+  3. Obsługa SIGUSR1 przez zdefiniowany handler
+  4. Tak samo jak w przypadku 2
+  4. Obsługuje SIGUSR1 przez zdefiniowany handler
+
+SIGKILL:
+
+  W każdym przypadku zabija proces
+
+SIGSTOP:
+
+  W kazdym przypadku suspenduje proces
+
+SIGTERM:
+
+  1. Domyślna obsługa sygnału powodująca zabicie całego procesu
+  2. Nie reaguje na sygnał SIGTERM
+  3. Obsługa SIGTERM przez zdefiniowany handler
+  4. Tak samo jak w przypadku 2.
+  5. Obsługa SIGTERM przez zdefiniowany handler

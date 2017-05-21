@@ -1,0 +1,36 @@
+
+procedure main()
+	#every x := gen(4) do
+	#	write(x)
+	
+	#every write(kombinuj("abcde", 3))
+	#every write(permutuj("abcd"))
+	
+	every write(wariuj(&lcase,5))
+end
+
+
+
+
+procedure gen(n)
+	if n = 0 then suspend "" else
+	suspend !"01" || gen(n-1)
+	
+	# suspend if n = 0 then "" else !"01" || gen(n-1)
+end
+
+procedure permutuj(s)
+	#if *s = 0 then suspend ""
+	#else {
+	#	suspend (x := permutuj(s[2:0]) , i := 1 to *s, suspend x[1:i] || s[1] || x[i:0])
+	#}
+	suspend if *s = 0 then  "" else (x := permutuj(s[2:0]) , i := 1 to *s,	suspend x[1:i] || s[1] || x[i:0])
+end
+
+procedure kombinuj(s, k)
+	suspend if k > *s then "" else if k = *s then s else kombinuj(s[2:0], k) | s[1] || kombinuj(s[2:0], k-1)
+end
+
+procedure wariuj(s,k)
+	suspend permutuj(kombinuj(s,k))
+end

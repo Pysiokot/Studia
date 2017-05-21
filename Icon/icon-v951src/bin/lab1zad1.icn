@@ -1,0 +1,11 @@
+procedure main()
+	write("hello")
+	write(&version)
+
+
+	write(&date)
+	write(&clock)
+	write(&time)
+	write(&host)
+
+end

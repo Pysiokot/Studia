@@ -1,0 +1,52 @@
+procedure main()
+	s := set([])
+	while insert(s,read())
+	every write(!s); write()
+	
+	s2 := reduce(s)
+	every write(!s2); write()
+	
+	wynig(s2)
+end
+
+
+
+procedure concat(s1, s2)
+	l := 0
+	every i := 1 to *s1 do {
+		if(s1[i] ~== s2[i]) then{
+			s1[i] := "-"
+			l +:= 1		
+		}
+	}
+	if l = 1 then return s1
+end
+
+procedure reduce(s)
+	s2 := set()
+	c := 0
+	every v1:=!s do {
+		b := 0
+		every v2:=!s do
+			if (insert(s2, concat(v1,v2))) then b := c := 1
+			if b = 0 then insert(s2, v1)
+	}
+	return if c = 1 then reduce(s2) else s2
+end	
+
+procedure wynig(s)
+	l := 0
+	every v := !s do{
+		if l > 0 then writes(" + ")
+		if v[1] == "1" then writes("a")
+		if v[1] == "0" then writes("!a")
+		if v[2] == "1" then writes("b")
+		if v[2] == "0" then writes("!b")
+		if v[3] == "1" then writes("c")
+		if v[3] == "0" then writes("!c")
+		if v[4] == "1" then writes("d")
+		if v[4] == "0" then writes("!d")
+		l +:= 1
+	}
+	write();
+end

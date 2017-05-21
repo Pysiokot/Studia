@@ -1,0 +1,30 @@
+procedure main()
+	l := [7,2,5,11,19,13,3,31]
+	
+	every writes(!l, " "); write()
+	
+	l := qs(l)
+	
+	every writes(!l, " "); write()
+	
+end
+
+
+procedure qs (l)
+
+	if *l = 0 then return l
+	
+	x := l[1]
+	l1 := []
+	l2 := []
+	l3 := []
+	
+	
+	while y := get(l) do
+		if y < x then put(l1, y)
+		else if y = x then put (l2, y)
+		else put(l3, y)
+		
+	return qs(l1) ||| l2 ||| qs(l3)
+
+end

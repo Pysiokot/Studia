@@ -1,0 +1,18 @@
+procedure main()
+	#every write(&features)
+
+	&random := map(&clock,":","1")
+	s := string(&lcase)
+	write(s)
+	every !s:=:?s
+	write(s)
+
+	#while w:=read() do{
+		#write(w)
+		#if find("kot", w) then write(w)		#czy zawiera substr
+		#if upto('do', w) then write(w)			#czy te litery sie pojawiajo
+		
+		#write(map(w,&lcase,&ucase))
+	#}
+	
+end	

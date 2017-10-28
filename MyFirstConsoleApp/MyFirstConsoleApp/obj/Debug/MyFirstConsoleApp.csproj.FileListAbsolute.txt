@@ -1,0 +1,15 @@
+c:\users\student\documents\visual studio 2012\Projects\MyFirstConsoleApp\MyFirstConsoleApp\bin\Debug\MyFirstConsoleApp.exe.config
+c:\users\student\documents\visual studio 2012\Projects\MyFirstConsoleApp\MyFirstConsoleApp\bin\Debug\MyFirstConsoleApp.exe
+c:\users\student\documents\visual studio 2012\Projects\MyFirstConsoleApp\MyFirstConsoleApp\bin\Debug\MyFirstConsoleApp.pdb
+c:\users\student\documents\visual studio 2012\Projects\MyFirstConsoleApp\MyFirstConsoleApp\bin\Debug\EntityFramework.dll
+c:\users\student\documents\visual studio 2012\Projects\MyFirstConsoleApp\MyFirstConsoleApp\bin\Debug\EntityFramework.SqlServer.dll
+c:\users\student\documents\visual studio 2012\Projects\MyFirstConsoleApp\MyFirstConsoleApp\bin\Debug\EntityFramework.xml
+c:\users\student\documents\visual studio 2012\Projects\MyFirstConsoleApp\MyFirstConsoleApp\bin\Debug\EntityFramework.SqlServer.xml
+c:\users\student\documents\visual studio 2012\Projects\MyFirstConsoleApp\MyFirstConsoleApp\obj\Debug\MyFirstConsoleApp.csprojResolveAssemblyReference.cache
+c:\users\student\documents\visual studio 2012\Projects\MyFirstConsoleApp\MyFirstConsoleApp\obj\Debug\MyFirstConsoleApp.exe
+c:\users\student\documents\visual studio 2012\Projects\MyFirstConsoleApp\MyFirstConsoleApp\obj\Debug\MyFirstConsoleApp.pdb
+c:\users\student\documents\visual studio 2012\Projects\MyFirstConsoleApp\MyFirstConsoleApp\obj\Debug\MyFirstConsoleApp.Migrations.InitialCreate.resources
+c:\users\student\documents\visual studio 2012\Projects\MyFirstConsoleApp\MyFirstConsoleApp\obj\Debug\MyFirstConsoleApp.csproj.GenerateResource.Cache
+c:\users\student\documents\visual studio 2012\Projects\MyFirstConsoleApp\MyFirstConsoleApp\obj\Debug\MyFirstConsoleApp.Migrations.AddUrl.resources
+c:\users\student\documents\visual studio 2012\Projects\MyFirstConsoleApp\MyFirstConsoleApp\obj\Debug\MyFirstConsoleApp.Migrations.Users.resources
+c:\users\student\documents\visual studio 2012\Projects\MyFirstConsoleApp\MyFirstConsoleApp\obj\Debug\MyFirstConsoleApp.BlogForm.resources

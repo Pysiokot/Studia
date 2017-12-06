@@ -1,0 +1,14 @@
+Wed Dec 06 14:54:52 CET 2017 : Apache Derby Network Server - 10.14.1.0 - (1808820) started and ready to accept connections on port 1527
+----------------------------------------------------------------
+Wed Dec 06 14:58:11 CET 2017:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.14.1.0 - (1808820): instance a816c00e-0160-2c1b-8f59-00000c742fb8 
+on database directory /home/students/s/z/szczypka/Studia/BD/BSzczypkaJPAPractice/db-derby-10.14.1.0-bin/bin/BSzczypkaJPAPractice with class loader sun.misc.Launcher$AppClassLoader@511d50c0 
+Loaded from file:/home/students/s/z/szczypka/Studia/BD/BSzczypkaJPAPractice/db-derby-10.14.1.0-bin/lib/derby.jar
+java.vendor=Oracle Corporation
+java.runtime.version=1.8.0_144-b01
+user.dir=/home/students/s/z/szczypka/Studia/BD/BSzczypkaJPAPractice/db-derby-10.14.1.0-bin/bin
+os.name=Linux
+os.arch=amd64
+os.version=4.13.9-200.fc26.x86_64
+derby.system.home=/home/students/s/z/szczypka/Studia/BD/BSzczypkaJPAPractice/db-derby-10.14.1.0-bin/bin
+Database Class Loader started - derby.database.classpath=''
